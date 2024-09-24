@@ -8,7 +8,6 @@ while (!['en', 'es'].includes(lang)) {
   prompt(messages.invalidLanguage);
   lang = readline.question();
 }
-console.log(lang);
 prompt(messages[lang].welcome);
 
 do {
