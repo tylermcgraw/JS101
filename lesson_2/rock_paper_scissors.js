@@ -1,16 +1,19 @@
 const readline = require('readline-sync');
-const VALID_CHOICES = ['rock', 'paper', 'scissors'];
+const VALID_CHOICES = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
+const WIN_CONDITIONS = {
+  rock: ['lizard', 'scissors'],
+  paper: ['rock', 'spock'],
+  scissors: ['paper', 'lizard'],
+  lizard: ['paper', 'spock'],
+  spock: ['rock', 'scissors']
+};
 
 function displayWinner(choice, computerChoice) {
   prompt(`You chose ${choice}, computer chose ${computerChoice}`);
 
-  if ((choice === 'rock' && computerChoice === 'scissors') ||
-      (choice === 'paper' && computerChoice === 'rock') ||
-      (choice === 'scissors' && computerChoice === 'paper')) {
+  if (WIN_CONDITIONS[choice].includes(computerChoice)) {
     prompt('You win!');
-  } else if ((choice === 'rock' && computerChoice === 'paper') ||
-             (choice === 'paper' && computerChoice === 'scissors') ||
-             (choice === 'scissors' && computerChoice === 'rock')) {
+  } else if (WIN_CONDITIONS[computerChoice].includes(choice)) {
     prompt('Computer wins!');
   } else {
     prompt("It's a tie!");
@@ -21,9 +24,18 @@ function prompt(message) {
   console.log(`=> ${message}`);
 }
 
+function convertChoice(input) {
+  VALID_CHOICES.forEach((choice) => {
+    if (input === choice.substring(0, input.length)) {
+      input = choice;
+    }
+  });
+  return input;
+}
+
 while (true) {
   prompt(`Choose one: ${VALID_CHOICES.join(', ')}`);
-  let choice = readline.question();
+  let choice = convertChoice(readline.question());
 
   while (!VALID_CHOICES.includes(choice)) {
     prompt("That's not a valid choice");
