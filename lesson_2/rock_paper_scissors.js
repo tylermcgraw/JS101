@@ -1,5 +1,6 @@
 const readline = require('readline-sync');
 const VALID_CHOICES = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
+const ABBREVIATED_CHOICES = ['r', 'p', 'sc', 'l', 'sp'];
 const WIN_CONDITIONS = {
   rock: ['lizard', 'scissors'],
   paper: ['rock', 'spock'],
@@ -7,10 +8,6 @@ const WIN_CONDITIONS = {
   lizard: ['paper', 'spock'],
   spock: ['rock', 'scissors']
 };
-const WIN_LIMIT = 3;
-let playerWins = 0;
-let computerWins = 0;
-let gameOver = false;
 const GAME_OUTCOME = {
   playerWin: 'You win!',
   computerWin: 'Computer wins!',
@@ -20,6 +17,11 @@ const FINAL_OUTCOME = {
   playerChampion: 'Congratulations! You are the grand champion!',
   computerChampion: 'Sorry. The computer is the grand champion!'
 };
+const WIN_LIMIT = 3;
+
+let playerWins = 0;
+let computerWins = 0;
+let gameOver = false;
 
 // Is it ok that displayGameWinner does 2 things - displays the winner
 // and increments playerWins/computerWins?
@@ -56,11 +58,10 @@ function prompt(message) {
 // Converts substrings  of choices to valid choices
 // Ex. 'r' -> 'rock', 'sc' -> 'scissors'
 function convertChoice(input) {
-  VALID_CHOICES.forEach((choice) => {
-    if (input === choice.substring(0, input.length)) {
-      input = choice;
-    }
-  });
+  if (ABBREVIATED_CHOICES.includes(input)) {
+    return VALID_CHOICES[
+      ABBREVIATED_CHOICES.findIndex((choice) => choice === input)];
+  }
   return input;
 }
 
@@ -68,9 +69,23 @@ function resetGame() {
   gameOver = false;
   playerWins = 0;
   computerWins = 0;
+  // clear screen
+  process.stdout.write('\x1Bc');
 }
 
-prompt(`Welcome to Rock, Paper, Scissors, Lizard, Spock! First to ${WIN_LIMIT} wins.`);
+function displayWelcomeMessages() {
+  prompt(`Welcome to Rock, Paper, Scissors, Lizard, Spock!`);
+  prompt(`First to ${WIN_LIMIT} wins.`);
+  let choicesWithAbbreviations = '';
+  for (let i = 0; i < VALID_CHOICES.length; i++) {
+    choicesWithAbbreviations += VALID_CHOICES[i] + ': ' +
+    ABBREVIATED_CHOICES[i];
+    if (i < VALID_CHOICES.length - 1) choicesWithAbbreviations += ', ';
+  }
+  prompt(`Abbreviations: ${choicesWithAbbreviations}`);
+}
+
+displayWelcomeMessages();
 while (!gameOver) {
   prompt(`Choose one: ${VALID_CHOICES.join(', ')}`);
   let choice = convertChoice(readline.question());
@@ -85,17 +100,16 @@ while (!gameOver) {
 
   displayGameWinner(choice, computerChoice);
   displayGrandWinner();
-  prompt(playerWins);
   gameOver = (playerWins === WIN_LIMIT || computerWins === WIN_LIMIT);
 
   if (gameOver) {
     prompt('Do you want to play again (y/n)?');
-    let answer = readline.question().toLowerCase();
-    while (answer[0] !== 'n' && answer[0] !== 'y') {
+    let answer = readline.question().trim().toLowerCase();
+    while (answer !== 'n' && answer !== 'y') {
       prompt('Please enter "y" or "n".');
       answer = readline.question().toLowerCase();
     }
 
-    if (answer[0] === 'y') resetGame();
+    if (answer === 'y') resetGame();
   }
 }
