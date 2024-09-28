@@ -1,1 +1,1 @@
-Launch School's JS101 Course
+Launch School's Programming Foundations with JavaScript: Beginner Course
